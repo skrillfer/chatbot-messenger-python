@@ -1,17 +1,4 @@
-# Copyright 2016 Google Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the 'License');
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an 'AS IS' BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
+# encoding: utf-8
 import webapp2
 import json
 import logging
@@ -52,7 +39,9 @@ def send_message(recipient_id,message_text):
     headers = {
         'Content-Type': 'application/json'
     }
-    message = {'text': message_text}
+    #message = {'text': message_text}
+    possible_answers = ['Opcion A','Opcion B', 'Opcion C']
+    message = get_postback_buttons_message(message_text,possible_answers)
     raw_data = {
         'recipient':{
             'id': recipient_id
@@ -66,8 +55,28 @@ def send_message(recipient_id,message_text):
     if r.status_code != 200:
         logging.error("Error enviando mensaje: %r", r.status_code)
 
+def get_postback_buttons_message(message_text,possible_answers):
+    buttons = []
+    for answer in possible_answers:
+        buttons.append({
+            'type' : 'postback',
+            'title' : answer,
+            'payload' : answer
+        })
+    return {
+        'attachment': {
+            'type': 'template',
+            'payload': {
+                'template_type': 'button',
+                'text': message_text,
+                'buttons': buttons
+            }
+        }
+    }
+
 app = webapp2.WSGIApplication([
     ('/', MainPage),
 ], debug=True)
 #text
 #https://developers.facebook.com/docs/messenger-platform/webhook/
+#https://developers.facebook.com/docs/messenger-platform/reference/buttons/postback
