@@ -32,7 +32,7 @@ class Bot(object):
                     if 'answers' in tree:
                         possible_answers =  tree['answers'].keys()
                     else:
-                        possible_answers = None
+                        possible_answers = []
         possible_answers.sort()
         self.send_callback(user_id,message_text,possible_answers)
 
