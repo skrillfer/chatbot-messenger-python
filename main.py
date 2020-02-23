@@ -70,7 +70,7 @@ def send_message(recipient_id,message_text,possible_answers):
         logging.error("Error %r enviando mensaje: %s", r.status_code,r.content)
 
 def get_postback_buttons_message(message_text,possible_answers):
-    if len(possible_answers) > 3:
+    if possible_answers is None or len(possible_answers) > 3:
         return None
     buttons = []
     for answer in possible_answers:
