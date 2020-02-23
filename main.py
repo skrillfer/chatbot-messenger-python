@@ -14,11 +14,11 @@ class MainPage(webapp2.RequestHandler):
         super(MainPage,self).__init__(request,response)
         logging.info('Instanciando bot')
         tree = yaml.load(open('tree.yaml'))
-        self.bot = Bot(send_message,None,tree)
-        dao = UserEventsDao()
+        self.bot = Bot(send_message,UserEventsDao(),tree)
         #dao.add_user_event('123','Luis Ramirez', 'abc')
-        data=dao.get_user_events('123')
-        print data
+        #data=dao.get_user_events('123')
+        #print data
+        #dao.remove_user_events('123')
 
     def get(self):
         self.response.headers['Content-Type'] = 'text/plain'

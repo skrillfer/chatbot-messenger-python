@@ -1,6 +1,6 @@
 from google.appengine.ext import ndb
 import logging
-
+#google cloude datastore
 class UserEvent(ndb.Model):
     user_id = ndb.StringProperty()
     author = ndb.StringProperty()
@@ -17,5 +17,12 @@ class UserEventsDao(object):
         logging.info('evento registrado:  %r', event)
     
     def get_user_events(self,user_id):
-        events = UserEvent.query(UserEvent.user_id == user_id)
+        events = UserEvent.query(UserEvent.user_id == user_id).order(UserEvent.date)#order by date asc
         return [(event.message,event.author) for event in events]
+    
+    def remove_user_events(self,user_id):# when reset conversation
+        events = UserEvent.query(UserEvent.user_id == user_id)
+        quantity = events.count()
+        for event in events:
+            event.key.delete()
+        logging.info('se eliminaron %r eventos',quantity)
