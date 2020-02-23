@@ -16,6 +16,6 @@ class UserEventsDao(object):
         event.put()#insert into db
         logging.info('evento registrado:  %r', event)
     
-    def get_user_event(self,user_id):
+    def get_user_events(self,user_id):
         events = UserEvent.query(UserEvent.user_id == user_id)
         return [(event.message,event.author) for event in events]
