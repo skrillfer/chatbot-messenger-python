@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
-DEFAULT_RESPONSE = 'Disculpa no entendí, deseas volver a empezar?'
-DEFAULT_POSSIBLE_ANSWERS = ['Sí','No']
+DEFAULT_RESPONSE = u'Disculpa no entendí, deseas volver a empezar?'
+DEFAULT_POSSIBLE_ANSWERS = [u'Sí',u'No']
 
 class Bot(object):
     def __init__(self, send_callback, users_dao, tree):
@@ -18,10 +18,14 @@ class Bot(object):
         
         tree = self.tree
         new_conversation = True
+        bot_asked_about_restart = False
         for text, author in history:
             if author == 'bot':
                 new_conversation = False
-                if 'say' in tree and text == tree['say'] and 'answers' in tree:
+                bot_asked_about_restart = False
+                if text == DEFAULT_RESPONSE:
+                    bot_asked_about_restart = True
+                elif 'say' in tree and text == tree['say'] and 'answers' in tree:
                     tree = tree['answers']
             elif author == 'user':
                 if new_conversation:
@@ -29,6 +33,14 @@ class Bot(object):
                     possible_answers = tree['answers'].keys()
                     possible_answers.sort()
                 else:
+                    if bot_asked_about_restart and text == u'Sí':
+                        tree = self.tree
+                        response_text = tree['say']
+                        possible_answers = tree['answers'].keys()
+                        possible_answers.sort()
+                        self.users_dao.remove_user_events(user_id)
+
+                        break
                     key = get_key_if_valid(text, tree)
                     if key is None:
                         response_text = DEFAULT_RESPONSE
