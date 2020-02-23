@@ -1,0 +1,3 @@
+create index google data store
+----gcloud datastore indexes create index.yaml
+

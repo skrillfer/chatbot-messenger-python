@@ -14,7 +14,8 @@ class MainPage(webapp2.RequestHandler):
         super(MainPage,self).__init__(request,response)
         logging.info('Instanciando bot')
         tree = yaml.load(open('tree.yaml'))
-        self.bot = Bot(send_message,UserEventsDao(),tree)
+        dao =UserEventsDao()
+        self.bot = Bot(send_message,dao,tree)
         #dao.add_user_event('123','Luis Ramirez', 'abc')
         #data=dao.get_user_events('123')
         #print data
