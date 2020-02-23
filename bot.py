@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
+DEFAULT_RESPONSE = 'Disculpa no entendí, deseas volver a empezar?'
+DEFAULT_POSSIBLE_ANSWERS = ['Sí','No']
 
 class Bot(object):
     def __init__(self, send_callback, users_dao, tree):
@@ -13,24 +15,32 @@ class Bot(object):
         self.users_dao.add_user_event(user_id,'user',user_message)
         #get history events and messages
         history = self.users_dao.get_user_events(user_id)
-        response_text = self.tree['say']
-        possible_answers = self.tree['answers'].keys()
-        possible_answers.sort()
+        
         tree = self.tree
+        new_conversation = True
         for text, author in history:
             if author == 'bot':
-                if 'say' in tree and text == tree['say']:
+                new_conversation = False
+                if 'say' in tree and text == tree['say'] and 'answers' in tree:
                     tree = tree['answers']
             elif author == 'user':
-                key = get_key_if_valid(text, tree)
-                if key is not None:
-                    tree = tree[key]
-                    if 'say' in tree:
-                        response_text = tree['say']
-                    if 'answers' in tree:
-                        possible_answers =  tree['answers'].keys()
+                if new_conversation:
+                    response_text = tree['say']
+                    possible_answers = tree['answers'].keys()
+                    possible_answers.sort()
+                else:
+                    key = get_key_if_valid(text, tree)
+                    if key is None:
+                        response_text = DEFAULT_RESPONSE
+                        possible_answers = DEFAULT_POSSIBLE_ANSWERS
                     else:
-                        possible_answers = []
+                        tree = tree[key]
+                        if 'say' in tree:
+                            response_text = tree['say']
+                        if 'answers' in tree:
+                            possible_answers =  tree['answers'].keys()
+                        else:
+                            possible_answers = []
         possible_answers.sort()
         self.send_callback(user_id,response_text,possible_answers)
         self.users_dao.add_user_event(user_id,'bot',response_text)
