@@ -9,8 +9,13 @@ class Bot(object):
         self.users_dao = users_dao#data access object
         self.tree = tree
     
-    def handle(self,user_id,user_message):
+    def handle(self,user_id,user_message,is_admin = False):
         logging.info("Se invoco el metodo handle")
+        if self.users_dao.admin_messages_exist(user_id):
+            return
+        if is_admin:
+            self.users_dao.add_user_event(user_id,'admin',user_message)
+            return    
         #put the last message of user
         self.users_dao.add_user_event(user_id,'user',user_message)
         #get history events and messages

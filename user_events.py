@@ -26,3 +26,7 @@ class UserEventsDao(object):
         for event in events:
             event.key.delete()
         logging.info('se eliminaron %r eventos',quantity)
+    
+    def admin_messages_exist(self,user_id):
+        events = UserEvent.query(UserEvent.user_id == user_id,UserEvent.author == 'admin')
+        return events.count() > 0

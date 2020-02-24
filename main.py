@@ -39,15 +39,28 @@ class MainPage(webapp2.RequestHandler):
             for entry in data['entry']:
                 for messagin_event in entry['messaging']:
                     sender_id = messagin_event['sender']['id']
+                    recipient_id = messagin_event['recipient']['id']
                     if messagin_event.get('message'):
+                        is_admin = False
                         message = messagin_event['message']
+                        if message.get('is_echo'):
+                            if message.get('app_id'): #bot
+                                # ignore echo message
+                                continue
+                            else: # admin
+                                #disable bot
+                                is_admin = True
                         message_text = messagin_event['message'].get('text','')
                         logging.info('Mensaje: %s',message_text)
-                        #send_message(sender_id,'Hola, soy un bot')
+                        #bot handle
+                        if is_admin:
+                            sender_id = recipient_id
+                        self.bot.handle(sender_id,message_text,is_admin)
+                    if messagin_event.get('postback'):
+                        message_text = messagin_event['postback']['payload']
                         #bot handle
                         self.bot.handle(sender_id,message_text)
-                    if messagin_event.get('postback'):
-                        logging.info('Post-back')
+                        logging.info('Post-back: %s',message_text)
     
 def send_message(recipient_id,message_text,possible_answers):
     logging.info("Enviando mensaje a  %r: %s", recipient_id,message_text)
