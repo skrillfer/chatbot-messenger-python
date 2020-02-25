@@ -107,8 +107,15 @@ def get_postback_buttons_message(message_text,possible_answers):
         }
     }
 
+class PrivacyPolicyPage(webapp2.RequestHandler):
+    def get(self):
+        self.response.headers['Content-Type'] = 'text/html'
+        htmlContent = open('privacy-policy.html').read()
+        self.response.write(htmlContent)
+
 app = webapp2.WSGIApplication([
     ('/', MainPage),
+    ('/privacy-policy', PrivacyPolicyPage),
 ], debug=True)
 #text
 #https://developers.facebook.com/docs/messenger-platform/webhook/
